@@ -129,11 +129,6 @@ class _HomePageState extends State<HomePage> {
     }
 
     try {
-      print(urlController.text.isEmpty ? "URL null" : urlController.text);
-      print(detailsController.text.isEmpty
-          ? "Detail null"
-          : detailsController.text);
-      print(selectedMisfortune!.id);
       final data = await ApiCaller().post(
         baseUrl,
         "api/2_2566/final/report_web",
@@ -145,7 +140,6 @@ class _HomePageState extends State<HomePage> {
               detailsController != null ? detailsController.text : "",
         },
       );
-      // API นี้จะส่งข้อมูลที่เรา post ไป กลับมาเป็น JSON object ดังนั้นต้องใช้ Map รับค่าจาก jsonDecode()
 
       // Parse the response JSON
       Map<String, dynamic> response = jsonDecode(data);
@@ -156,13 +150,38 @@ class _HomePageState extends State<HomePage> {
       String type = response['insertItem']['type'];
       List<dynamic> summary = response['summary'];
 
-      // Show dialog here
+      // Show dialog with extracted values
       showDialog(
         context: context,
         builder: (BuildContext context) {
+          // Extract counts from the summary list
+          List<Map<String, dynamic>> counts = summary.map((item) {
+            return {'title': item['title'], 'count': item['count']};
+          }).toList();
+
           return AlertDialog(
             title: Text('Success'),
-            // content: Text(text),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('ขอบคุณสำหรับการแจ้งข้อมูล รหัสข้อมูลของคุณคือ $id'),
+                SizedBox(height: 16.0),
+                Text('สถิติการรายงาน\n====='),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: counts.map((countItem) {
+                    return Row(
+                      children: [
+                        Icon(Icons.collections),
+                        SizedBox(width: 8.0),
+                        Text('${countItem['title']}: ${countItem['count']}'),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
