@@ -146,9 +146,16 @@ class _HomePageState extends State<HomePage> {
         },
       );
       // API นี้จะส่งข้อมูลที่เรา post ไป กลับมาเป็น JSON object ดังนั้นต้องใช้ Map รับค่าจาก jsonDecode()
-      Map map = jsonDecode(data);
-      // String text =
-      //     'ส่งข้อมูลสำเร็จ\n\n - id: ${map['fake-news']} \n - url: ${map['URL']} \n - detail: ${map['detail']}';
+
+      // Parse the response JSON
+      Map<String, dynamic> response = jsonDecode(data);
+
+      // Extract the values
+      int id = response['insertItem']['id'];
+      String url = response['insertItem']['url'];
+      String type = response['insertItem']['type'];
+      List<dynamic> summary = response['summary'];
+
       // Show dialog here
       showDialog(
         context: context,
